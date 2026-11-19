@@ -19,7 +19,7 @@ const elements = Object.fromEntries(
     .map(id => [id, element()])
 );
 elements.systemMode.value = "geez";
-elements.sourceLanguage.value = "ethiopic";
+elements.sourceLanguage.value = "geez";
 elements.direction.value = "forward";
 const context = vm.createContext({ document: {
   getElementById: id => elements[id],
@@ -61,7 +61,7 @@ test("switches language without losing input and loads the corresponding sample"
   assert.equal(elements.systemGroup.hidden, true);
   elements.sampleButton.events.click();
   assert.equal(elements.outputText.value, "אלסלאם עליכם");
-  elements.sourceLanguage.value = "ethiopic";
+  elements.sourceLanguage.value = "geez";
   elements.sourceLanguage.events.change();
   assert.equal(elements.inputText.dir, "ltr");
   assert.equal(elements.systemGroup.hidden, false);
