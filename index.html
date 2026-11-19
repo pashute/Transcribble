@@ -105,7 +105,7 @@
       </select>
     </div>
     <div class="control-group" id="dictionaryGroup">
-      <label for="dictionarySource">מילון לחיפוש:</label>
+      <label for="dictionarySource">מילון או מתרגם לחיפוש:</label>
       <select id="dictionarySource"></select>
     </div>
     <div class="control-group">
@@ -137,7 +137,7 @@
   <div id="wordSection" class="words">
     <strong>לחצו על תעתיק לחיפוש מילת המקור במילון שנבחר:</strong>
     <div id="wordList"></div>
-    <div id="dictionary" class="dictionary" role="status">החיפוש שולח את מילת המקור למילון שנבחר ודורש חיבור לאינטרנט.</div>
+    <div id="dictionary" class="dictionary" role="status">החיפוש דורש חיבור לאינטרנט.</div>
   </div>
   <div class="note">
     התעתיק אינו כולל סימני תנועות. סימנים המבחינים בין עיצורים, כגון שׂ ו־פּ, נשמרים.
@@ -216,6 +216,7 @@
     syriac: { label: "סורית קלאסית", script: "syriac", lang: "syc", heading: "Classical Syriac", sample: "ܫܠܡܐ" }
   };
   const dictionaries = {
+    googleAmharic: { label: "Google Translate (אמהרית לעברית)", url: word => "https://translate.google.com/?" + new URLSearchParams({ sl: "am", tl: "he", text: word, op: "translate" }) },
     english: { label: "Wiktionary (English)", url: word => "https://en.wiktionary.org/wiki/" + encodeURIComponent(word) },
     amharic: { label: "AmharicPro (אמהרית)", url: word => "https://www.amharicpro.com/index.php?dr=101&searchkey=" + encodeURIComponent(word) },
     amharicWiktionary: { label: "Wiktionary (አማርኛ)", url: word => "https://am.wiktionary.org/wiki/" + encodeURIComponent(word) },
@@ -223,7 +224,7 @@
     arabicWiktionary: { label: "Wiktionary (العربية)", url: word => "https://ar.wiktionary.org/wiki/" + encodeURIComponent(word) }
   };
   const dictionariesByLanguage = {
-    geez: ["english"],
+    geez: ["googleAmharic", "english"],
     amharic: ["amharic", "amharicWiktionary", "english"],
     tigrinya: ["tigrinyaWiktionary", "english"],
     arabic: ["arabicWiktionary", "english"],
@@ -369,13 +370,15 @@
       return lookupWord(word, language, selected);
     }
     lookupVersion++;
-    const url = selected.url(lookupTitle(word, language));
-    dictionary.textContent = `${languages[language].label} — ${word}: ${selected.label}. `;
+    const lookup = dictionarySource.value === "googleAmharic" ? splitPrefix(word, language)[1] : lookupTitle(word, language);
+    const url = selected.url(lookup);
+    dictionary.textContent = `${languages[language].label} — ${word}: ${selected.label}. ` +
+      (lookup !== word && dictionarySource.value === "googleAmharic" ? `נשלח ללא תחילית אפשרית: ${lookup}. ` : "");
     const link = document.createElement("a");
     link.href = url;
     link.target = "_blank";
     link.rel = "noopener noreferrer";
-    link.textContent = "פתיחת מילת המקור במילון";
+    link.textContent = dictionarySource.value === "googleAmharic" ? "פתיחה ב-Google Translate" : "פתיחת מילת המקור במילון";
     dictionary.appendChild(link);
     link.click();
   }
@@ -501,7 +504,7 @@
   function updateWords() {
     lookupVersion++;
     wordList.replaceChildren();
-    dictionary.textContent = "החיפוש שולח את מילת המקור למילון שנבחר ודורש חיבור לאינטרנט.";
+    dictionary.textContent = "החיפוש דורש חיבור לאינטרנט.";
     const language = sourceLanguage.value;
     const script = languages[language].script;
     const matches = input.value.match(/[\p{L}\p{M}]+/gu) || [];
@@ -599,6 +602,7 @@
       copyStatus.textContent = "ההעתקה נכשלה. אפשר לסמן ולהעתיק את התוצאה ידנית.";
     }
   });
+  updateDictionaryChoices();
   updateOutput();
 </script>
 </body>

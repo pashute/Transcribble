@@ -26,7 +26,6 @@ function setup(fetch) {
   elements.systemMode.value = "geez";
   elements.sourceLanguage.value = "geez";
   elements.direction.value = "forward";
-  elements.dictionarySource.value = "english";
   const context = vm.createContext({
     URLSearchParams, fetch,
     document: {
@@ -47,12 +46,45 @@ function links(element) {
   return element.children.flatMap(child => child.href ? [child] : child.children ? links(child) : []);
 }
 
+test("Ge'ez defaults to Google Translate and sends the original-script stem", () => {
+  const elements = setup(() => { throw new Error("Unexpected fetch"); });
+  assert.equal(elements.dictionarySource.value, "googleAmharic");
+  elements.inputText.value = "ወለግብረ ዝንቱ";
+  elements.inputText.events.input();
+  const [prefixed, plain] = elements.wordList.children;
+  assert.equal(prefixed.children.at(-1).textContent, "ወለግብረ");
+  prefixed.events.click();
+  let link = links(elements.dictionary)[0];
+  let url = new URL(link.href);
+  assert.equal(url.origin, "https://translate.google.com");
+  assert.equal(url.searchParams.get("sl"), "am");
+  assert.equal(url.searchParams.get("tl"), "he");
+  assert.equal(url.searchParams.get("text"), "ግብረ");
+  assert.match(elements.dictionary.textContent, /ወለግብረ.*ግብረ/);
+  assert.equal(link.clicked, true);
+  plain.events.click();
+  url = new URL(links(elements.dictionary)[0].href);
+  assert.equal(url.searchParams.get("text"), "ዝንቱ");
+  assert.equal(plain.children.at(-1).textContent, "ዝንቱ");
+});
+
+test("returning to Ge'ez restores the Google Translate default", () => {
+  const elements = setup(() => { throw new Error("Unexpected fetch"); });
+  elements.sourceLanguage.value = "amharic";
+  elements.sourceLanguage.events.change();
+  assert.equal(elements.dictionarySource.value, "amharic");
+  elements.sourceLanguage.value = "geez";
+  elements.sourceLanguage.events.change();
+  assert.equal(elements.dictionarySource.value, "googleAmharic");
+});
+
 test("missing Ge'ez entry offers original-word search and dictionary references", async () => {
   const requests = [];
   const elements = setup(async url => {
     requests.push(new URL(url));
     return response({ missing: true, title: "ዝንቱ" });
   });
+  elements.dictionarySource.value = "english";
   elements.inputText.value = "ዝንቱ";
   elements.inputText.events.input();
   const button = elements.wordList.children[0];
@@ -71,6 +103,7 @@ test("a page without a Ge'ez section also offers alternatives", async () => {
   const elements = setup(async () => response({
     title: "ዝንቱ", revisions: [{ slots: { main: { content: "==Amharic==\ntext" } } }]
   }));
+  elements.dictionarySource.value = "english";
   elements.inputText.value = "ዝንቱ";
   elements.inputText.events.input();
   await elements.wordList.children[0].events.click();
@@ -80,6 +113,7 @@ test("a page without a Ge'ez section also offers alternatives", async () => {
 
 test("lookup failures name the selected dictionary without claiming an entry is missing", async () => {
   const elements = setup(async () => ({ ok: false }));
+  elements.dictionarySource.value = "english";
   elements.inputText.value = "ዝንቱ";
   elements.inputText.events.input();
   await elements.wordList.children[0].events.click();
@@ -103,6 +137,7 @@ test("external dictionary uses the original word and identifies the selected sou
 test("changing dictionary suppresses an earlier lookup result", async () => {
   let resolveFetch;
   const elements = setup(() => new Promise(resolve => { resolveFetch = resolve; }));
+  elements.dictionarySource.value = "english";
   elements.inputText.value = "ዝንቱ";
   elements.inputText.events.input();
   const pending = elements.wordList.children[0].events.click();
@@ -111,4 +146,18 @@ test("changing dictionary suppresses an earlier lookup result", async () => {
   await pending;
   assert.doesNotMatch(elements.dictionary.textContent, /לא נמצאה/);
   assert.equal(links(elements.dictionary).length, 0);
+});
+
+test("selecting Wiktionary still looks up the complete prefixed Ge'ez word", async () => {
+  const requests = [];
+  const elements = setup(async url => {
+    requests.push(new URL(url));
+    return response({ missing: true, title: "ወለግብረ" });
+  });
+  elements.dictionarySource.value = "english";
+  elements.inputText.value = "ወለግብረ";
+  elements.inputText.events.input();
+  await elements.wordList.children[0].events.click();
+  assert.equal(requests[0].searchParams.get("titles"), "ወለግብረ");
+  assert.equal(new URL(links(elements.dictionary)[0].href).searchParams.get("search"), "ወለግብረ");
 });
