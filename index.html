@@ -364,12 +364,11 @@
   }
 
   function openDictionary(word, language) {
+    const selected = dictionaries[dictionarySource.value];
     if (dictionarySource.value === "english") {
-      lookupWord(word, language);
-      return;
+      return lookupWord(word, language, selected);
     }
     lookupVersion++;
-    const selected = dictionaries[dictionarySource.value];
     const url = selected.url(lookupTitle(word, language));
     dictionary.textContent = `${languages[language].label} — ${word}: ${selected.label}. `;
     const link = document.createElement("a");
@@ -381,10 +380,31 @@
     link.click();
   }
 
-  async function lookupWord(word, language) {
+  function appendGeezAlternatives(word) {
+    const alternatives = document.createElement("p");
+    alternatives.textContent = "אפשר לחפש את מילת המקור או לעיין במילוני געז נוספים: ";
+    const links = [
+      ["חיפוש ב-Wiktionary", "https://en.wiktionary.org/w/index.php?" +
+        new URLSearchParams({ title: "Special:Search", search: word, fulltext: "1" })],
+      ["Beta maṣāḥǝft / Dillmann", "https://betamasaheft.eu/Dillmann/"],
+      ["Leslau, Comparative Dictionary of Ge'ez", "https://archive.org/details/leslau-comparative-dictionary-of-geez-1987"]
+    ];
+    for (const [index, [text, url]] of links.entries()) {
+      if (index) alternatives.appendChild(document.createTextNode(" | "));
+      const link = document.createElement("a");
+      link.href = url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = text;
+      alternatives.appendChild(link);
+    }
+    dictionary.appendChild(alternatives);
+  }
+
+  async function lookupWord(word, language, selected) {
     const version = ++lookupVersion;
     const label = languages[language].label;
-    dictionary.textContent = `${label} — ${word}: מחפש בוויקימילון…`;
+    dictionary.textContent = `${label} — ${word}: מחפש ב-${selected.label}…`;
     const title = lookupTitle(word, language);
     const params = new URLSearchParams({
       action: "query", prop: "revisions", rvprop: "content", rvslots: "main",
@@ -410,24 +430,28 @@
       const content = page.revisions?.[0]?.slots?.main?.content;
       if (typeof content !== "string") {
         if (!page.missing) throw new Error("Missing Wiktionary content");
-        dictionary.textContent = `${label} — ${word}: לא נמצאה רשומה למילה זו בוויקימילון.`;
+        dictionary.textContent = `${label} — ${word}: לא נמצאה רשומה למילה זו ב-${selected.label}.`;
+        if (language === "geez") appendGeezAlternatives(word);
         return;
       }
       const entries = parseWiktionary(content, language);
       dictionary.textContent = `${label} — ${word}: ` + (!entries.found
-        ? "לא נמצאה רשומה בשפה שנבחרה."
+        ? `לא נמצאה רשומה בשפה שנבחרה ב-${selected.label}.`
         : "שורש ערבי מתועד: " + (entries.roots.join(", ") || "לא נמצא") +
         " | מילים קרובות בעברית: " + (entries.hebrew.join(", ") || "לא נמצאו") +
         " | מילים קרובות בערבית: " + (entries.arabic.join(", ") || "לא נמצאו") +
         ". מילים קרובות אינן בהכרח תרגומים; ייתכן שהרשומה מכילה מידע נוסף.") + " ";
       const link = document.createElement("a");
-      link.href = "https://en.wiktionary.org/wiki/" + encodeURIComponent(page.title) +
+      link.href = selected.url(page.title) +
         "#" + encodeURIComponent(languages[language].heading.replaceAll(" ", "_"));
       link.target = "_blank";
       link.rel = "noopener noreferrer";
       link.textContent = "לרשומה בשפת המקור בוויקימילון";
       dictionary.appendChild(link);
-      if (!entries.found) return;
+      if (!entries.found) {
+        if (language === "geez") appendGeezAlternatives(word);
+        return;
+      }
 
       try {
         const parseParams = new URLSearchParams({
@@ -469,7 +493,7 @@
       }
     } catch (error) {
       if (version === lookupVersion) {
-        dictionary.textContent = `${label} — ${word}: החיפוש בוויקימילון נכשל. בדקו את החיבור לאינטרנט ונסו שוב.`;
+        dictionary.textContent = `${label} — ${word}: החיפוש ב-${selected.label} נכשל. בדקו את החיבור לאינטרנט ונסו שוב.`;
       }
     }
   }
