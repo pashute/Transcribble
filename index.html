@@ -104,6 +104,10 @@
         <option value="amharic">פונטי / אמהרית מודרנית</option>
       </select>
     </div>
+    <div class="control-group" id="dictionaryGroup">
+      <label for="dictionarySource">מילון לחיפוש:</label>
+      <select id="dictionarySource"></select>
+    </div>
     <div class="control-group">
       <label for="direction">כיוון התעתיק:</label>
       <select id="direction">
@@ -131,9 +135,9 @@
     </div>
   </div>
   <div id="wordSection" class="words">
-    <strong>לחצו על תעתיק לחיפוש מילת המקור בשפת המקור בוויקימילון:</strong>
+    <strong>לחצו על תעתיק לחיפוש מילת המקור במילון שנבחר:</strong>
     <div id="wordList"></div>
-    <div id="dictionary" class="dictionary" role="status">החיפוש שולח את מילת המקור לוויקימילון ודורש חיבור לאינטרנט.</div>
+    <div id="dictionary" class="dictionary" role="status">החיפוש שולח את מילת המקור למילון שנבחר ודורש חיבור לאינטרנט.</div>
   </div>
   <div class="note">
     התעתיק אינו כולל סימני תנועות. סימנים המבחינים בין עיצורים, כגון שׂ ו־פּ, נשמרים.
@@ -211,6 +215,21 @@
     aramaic: { label: "ארמית", script: "syriac", lang: "arc", heading: "Aramaic", sample: "ܫܠܡܐ" },
     syriac: { label: "סורית קלאסית", script: "syriac", lang: "syc", heading: "Classical Syriac", sample: "ܫܠܡܐ" }
   };
+  const dictionaries = {
+    english: { label: "Wiktionary (English)", url: word => "https://en.wiktionary.org/wiki/" + encodeURIComponent(word) },
+    amharic: { label: "AmharicPro (אמהרית)", url: word => "https://www.amharicpro.com/index.php?dr=101&searchkey=" + encodeURIComponent(word) },
+    amharicWiktionary: { label: "Wiktionary (አማርኛ)", url: word => "https://am.wiktionary.org/wiki/" + encodeURIComponent(word) },
+    tigrinyaWiktionary: { label: "Wiktionary (ትግርኛ)", url: word => "https://ti.wiktionary.org/wiki/" + encodeURIComponent(word) },
+    arabicWiktionary: { label: "Wiktionary (العربية)", url: word => "https://ar.wiktionary.org/wiki/" + encodeURIComponent(word) }
+  };
+  const dictionariesByLanguage = {
+    geez: ["english"],
+    amharic: ["amharic", "amharicWiktionary", "english"],
+    tigrinya: ["tigrinyaWiktionary", "english"],
+    arabic: ["arabicWiktionary", "english"],
+    aramaic: ["english"],
+    syriac: ["english"]
+  };
   const finals = { "כ": "ך", "מ": "ם", "נ": "ן", "פ": "ף", "צ": "ץ" };
   const input = document.getElementById("inputText");
   const output = document.getElementById("outputText");
@@ -218,6 +237,8 @@
   const sourceLanguage = document.getElementById("sourceLanguage");
   const direction = document.getElementById("direction");
   const systemGroup = document.getElementById("systemGroup");
+  const dictionaryGroup = document.getElementById("dictionaryGroup");
+  const dictionarySource = document.getElementById("dictionarySource");
   const inputLabel = document.getElementById("inputLabel");
   const outputLabel = document.getElementById("outputLabel");
   const wordSection = document.getElementById("wordSection");
@@ -335,14 +356,36 @@
     return entries;
   }
 
+  function lookupTitle(word, language) {
+    return languages[language].script === "arabic"
+      ? word.replace(/[\u0621-\u064a][\u064b-\u065f]*/gu, part => part.normalize("NFC"))
+        .replace(/[\u0610-\u061a\u064b-\u065f\u0670ـ]/gu, "")
+      : word;
+  }
+
+  function openDictionary(word, language) {
+    if (dictionarySource.value === "english") {
+      lookupWord(word, language);
+      return;
+    }
+    lookupVersion++;
+    const selected = dictionaries[dictionarySource.value];
+    const url = selected.url(lookupTitle(word, language));
+    dictionary.textContent = `${languages[language].label} — ${word}: ${selected.label}. `;
+    const link = document.createElement("a");
+    link.href = url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = "פתיחת מילת המקור במילון";
+    dictionary.appendChild(link);
+    link.click();
+  }
+
   async function lookupWord(word, language) {
     const version = ++lookupVersion;
     const label = languages[language].label;
     dictionary.textContent = `${label} — ${word}: מחפש בוויקימילון…`;
-    const title = languages[language].script === "arabic"
-      ? word.replace(/[\u0621-\u064a][\u064b-\u065f]*/gu, part => part.normalize("NFC"))
-        .replace(/[\u0610-\u061a\u064b-\u065f\u0670ـ]/gu, "")
-      : word;
+    const title = lookupTitle(word, language);
     const params = new URLSearchParams({
       action: "query", prop: "revisions", rvprop: "content", rvslots: "main",
       titles: title, redirects: "1", format: "json", formatversion: "2", origin: "*"
@@ -434,7 +477,7 @@
   function updateWords() {
     lookupVersion++;
     wordList.replaceChildren();
-    dictionary.textContent = "החיפוש שולח את מילת המקור לוויקימילון ודורש חיבור לאינטרנט.";
+    dictionary.textContent = "החיפוש שולח את מילת המקור למילון שנבחר ודורש חיבור לאינטרנט.";
     const language = sourceLanguage.value;
     const script = languages[language].script;
     const matches = input.value.match(/[\p{L}\p{M}]+/gu) || [];
@@ -461,7 +504,7 @@
       original.textContent = word;
       button.appendChild(original);
       button.title = word;
-      button.addEventListener("click", () => lookupWord(word, language));
+      button.addEventListener("click", () => openDictionary(word, language));
       wordList.appendChild(button);
     }
   }
@@ -483,6 +526,7 @@
     const ethiopic = language.script === "ethiopic";
     const reverse = direction.value === "reverse";
     systemGroup.hidden = !ethiopic;
+    dictionaryGroup.hidden = reverse;
     wordSection.hidden = reverse;
     input.dir = reverse || !ethiopic ? "rtl" : "ltr";
     input.lang = reverse ? "he" : language.lang;
@@ -493,10 +537,25 @@
     sampleButton.textContent = reverse ? "טען דוגמה בעברית" : `טען דוגמה ב${language.label}`;
     updateOutput();
   }
-  sourceLanguage.addEventListener("change", updateControls);
+  function updateDictionaryChoices() {
+    dictionarySource.replaceChildren();
+    for (const id of dictionariesByLanguage[sourceLanguage.value]) {
+      const option = document.createElement("option");
+      option.value = id;
+      option.textContent = dictionaries[id].label;
+      dictionarySource.appendChild(option);
+    }
+    dictionarySource.value = dictionariesByLanguage[sourceLanguage.value][0];
+  }
+  sourceLanguage.addEventListener("change", () => {
+    updateDictionaryChoices();
+    updateControls();
+  });
+  dictionarySource.addEventListener("change", updateWords);
   direction.addEventListener("change", updateControls);
   sampleButton.addEventListener("click", () => {
     input.value = direction.value === "reverse" ? "שלום עולם" : languages[sourceLanguage.value].sample;
+    updateDictionaryChoices();
     updateControls();
   });
   document.getElementById("clearButton").addEventListener("click", () => {

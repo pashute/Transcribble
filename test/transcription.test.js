@@ -15,7 +15,7 @@ function element() {
   };
 }
 const elements = Object.fromEntries(
-  ["inputText", "outputText", "systemMode", "sourceLanguage", "direction", "systemGroup", "inputLabel", "outputLabel", "wordSection", "wordList", "dictionary", "copyStatus", "sampleButton", "clearButton", "copyButton"]
+  ["inputText", "outputText", "systemMode", "sourceLanguage", "direction", "systemGroup", "dictionaryGroup", "dictionarySource", "inputLabel", "outputLabel", "wordSection", "wordList", "dictionary", "copyStatus", "sampleButton", "clearButton", "copyButton"]
     .map(id => [id, element()])
 );
 elements.systemMode.value = "geez";
