@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Transcribble - משעתק געז / אמהרית לעברית</title>
+  <title>Transcribble - משעתק לעברית</title>
   <style>
     body {
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
@@ -38,6 +38,7 @@
       border: 1px solid #e2e8f0;
     }
     .control-group { display: flex; flex-direction: column; gap: 6px; }
+    .control-group[hidden] { display: none; }
     label { font-weight: 600; font-size: 0.9rem; }
     select, button {
       padding: 8px 12px;
@@ -64,9 +65,7 @@
       box-sizing: border-box;
       resize: vertical;
     }
-    #inputText {
-      direction: ltr;
-      text-align: left;
+    #inputText[dir="ltr"] {
       font-family: "Nyala", "Abyssinica SIL", "Noto Sans Ethiopic", serif;
     }
     #outputText {
@@ -82,9 +81,16 @@
 </head>
 <body>
 <div class="container">
-  <h1>Transcribble — משעתק געז / אמהרית לעברית</h1>
+  <h1>Transcribble — משעתק לעברית</h1>
   <div class="controls">
     <div class="control-group">
+      <label for="sourceLanguage">שפת המקור:</label>
+      <select id="sourceLanguage">
+        <option value="ethiopic">געז / אמהרית</option>
+        <option value="arabic">ערבית</option>
+      </select>
+    </div>
+    <div class="control-group" id="systemGroup">
       <label for="systemMode">שיטת מיפוי עיצורים:</label>
       <select id="systemMode">
         <option value="geez">אטימולוגי / געז (משמר ח׳, שׂ, צ׳, ק׳)</option>
@@ -94,8 +100,8 @@
   </div>
   <div class="grid">
     <div>
-      <label for="inputText">טקסט מקור (געז / אמהרית):</label>
-      <textarea id="inputText" placeholder="הדבק כאן טקסט בכתב אתיופי (פידל)...">መጽሐፈ ኩፋሌ ወለደ ነገረ ሰማይ ወምድር</textarea>
+      <label for="inputText" id="inputLabel">טקסט מקור (געז / אמהרית):</label>
+      <textarea id="inputText" dir="ltr" lang="gez" placeholder="הדבק כאן טקסט בכתב אתיופי (פידל)...">መጽሐፈ ኩፋሌ ወለደ ነገረ ሰማይ ወምድር</textarea>
       <div class="actions">
         <button class="secondary" id="sampleButton" type="button">טען דוגמה מספר היובלים (פרק א׳)</button>
         <button class="secondary" id="clearButton" type="button">נקה</button>
@@ -162,10 +168,23 @@
     0x1361: " ", 0x1362: ".", 0x1363: ",", 0x1364: ";",
     0x1365: ":", 0x1366: ":", 0x1367: "?", 0x1368: "¶"
   };
+  const arabicLetters = {
+    "ا": "א", "أ": "א", "إ": "א", "آ": "א", "ٱ": "א", "ء": "א",
+    "ؤ": "ו", "ئ": "י", "ب": "ב", "ت": "ת", "ث": "ת׳", "ج": "ג׳",
+    "ح": "ח", "خ": "ח׳", "د": "ד", "ذ": "ד׳", "ر": "ר", "ز": "ז",
+    "س": "ס", "ش": "שׁ", "ص": "צ", "ض": "צ׳", "ط": "ט", "ظ": "ט׳",
+    "ع": "ע", "غ": "ע׳", "ف": "פ", "ق": "ק", "ك": "כ", "ل": "ל",
+    "م": "מ", "ن": "נ", "ه": "ה", "ة": "ה", "و": "ו", "ي": "י", "ى": "א"
+  };
+  const arabicPunctuation = { "،": ",", "؛": ";", "؟": "?" };
   const finals = { "כ": "ך", "מ": "ם", "נ": "ן", "פ": "ף", "צ": "ץ" };
   const input = document.getElementById("inputText");
   const output = document.getElementById("outputText");
   const system = document.getElementById("systemMode");
+  const sourceLanguage = document.getElementById("sourceLanguage");
+  const systemGroup = document.getElementById("systemGroup");
+  const inputLabel = document.getElementById("inputLabel");
+  const sampleButton = document.getElementById("sampleButton");
   const copyStatus = document.getElementById("copyStatus");
 
   function transcribe(text, mode) {
@@ -183,14 +202,40 @@
     return result.replace(/([כמנפצ])(?=[\s.,;:?!]|$)/g, letter => finals[letter]);
   }
 
+  function transcribeArabic(text) {
+    let result = "";
+    const normalized = text.replace(/[\u0621-\u064a][\u064b-\u065f]*/gu, part => part.normalize("NFC"));
+    for (const character of normalized) {
+      if (/[\u0610-\u061a\u064b-\u065f\u0670]/u.test(character) || character === "ـ") {
+        continue;
+      }
+      result += arabicLetters[character] ?? arabicPunctuation[character] ?? character;
+    }
+    return result.replace(/([כמנפצ])(?=׳?(?:[^\p{L}\p{M}׳]|$))/gu, letter => finals[letter]);
+  }
+
   function updateOutput() {
-    output.value = transcribe(input.value, system.value);
+    output.value = sourceLanguage.value === "arabic"
+      ? transcribeArabic(input.value)
+      : transcribe(input.value, system.value);
     copyStatus.textContent = "";
   }
   input.addEventListener("input", updateOutput);
   system.addEventListener("change", updateOutput);
-  document.getElementById("sampleButton").addEventListener("click", () => {
-    input.value = "ዝንቱ ፡ ነገረ ፡ ኩፋሌ ፡ መዋዕለ ፡ ሕግ ፡ ወስምዕ ፡ ለግብረ ፡ ዓመታት ፡ በበሱባዔሆሙ ፡ ወበበኢዮቤልዎሙ ፡ በኵሉ ፡ ዓመታተ ፡ ዓለም ፡ በከመ ፡ ተናገሮ ፡ እግዚአብሔር ፡ ለሙሴ ፡ በደብረ ፡ ሲና ።";
+  sourceLanguage.addEventListener("change", () => {
+    const arabic = sourceLanguage.value === "arabic";
+    systemGroup.hidden = arabic;
+    input.dir = arabic ? "rtl" : "ltr";
+    input.lang = arabic ? "ar" : "gez";
+    inputLabel.textContent = arabic ? "טקסט מקור (ערבית):" : "טקסט מקור (געז / אמהרית):";
+    input.placeholder = arabic ? "הדבק כאן טקסט בערבית..." : "הדבק כאן טקסט בכתב אתיופי (פידל)...";
+    sampleButton.textContent = arabic ? "טען דוגמה בערבית" : "טען דוגמה מספר היובלים (פרק א׳)";
+    updateOutput();
+  });
+  sampleButton.addEventListener("click", () => {
+    input.value = sourceLanguage.value === "arabic"
+      ? "السَّلَامُ عَلَيْكُمْ"
+      : "ዝንቱ ፡ ነገረ ፡ ኩፋሌ ፡ መዋዕለ ፡ ሕግ ፡ ወስምዕ ፡ ለግብረ ፡ ዓመታት ፡ በበሱባዔሆሙ ፡ ወበበኢዮቤልዎሙ ፡ በኵሉ ፡ ዓመታተ ፡ ዓለም ፡ በከመ ፡ ተናገሮ ፡ እግዚአብሔር ፡ ለሙሴ ፡ በደብረ ፡ ሲና ።";
     updateOutput();
   });
   document.getElementById("clearButton").addEventListener("click", () => {
