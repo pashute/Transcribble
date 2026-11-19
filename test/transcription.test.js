@@ -6,15 +6,26 @@ const path = require("node:path");
 
 const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
+function element() {
+  return {
+    value: "", events: {},
+    addEventListener(event, handler) { this.events[event] = handler; },
+    appendChild() {},
+    replaceChildren() {}
+  };
+}
 const elements = Object.fromEntries(
-  ["inputText", "outputText", "systemMode", "sourceLanguage", "systemGroup", "inputLabel", "copyStatus", "sampleButton", "clearButton", "copyButton"]
-    .map(id => [id, {
-      value: id === "systemMode" ? "geez" : id === "sourceLanguage" ? "ethiopic" : "",
-      events: {},
-      addEventListener(event, handler) { this.events[event] = handler; }
-    }])
+  ["inputText", "outputText", "systemMode", "sourceLanguage", "direction", "systemGroup", "inputLabel", "outputLabel", "wordSection", "wordList", "dictionary", "copyStatus", "sampleButton", "clearButton", "copyButton"]
+    .map(id => [id, element()])
 );
-const context = vm.createContext({ document: { getElementById: id => elements[id] } });
+elements.systemMode.value = "geez";
+elements.sourceLanguage.value = "ethiopic";
+elements.direction.value = "forward";
+const context = vm.createContext({ document: {
+  getElementById: id => elements[id],
+  createElement: element,
+  createTextNode: text => ({ textContent: text })
+} });
 vm.runInContext(script, context);
 
 test("transcribes consonants without vowel marks", () => {
