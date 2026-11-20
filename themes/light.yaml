@@ -1,0 +1,16 @@
+# Transcribble theme. Each key under colors becomes a CSS variable: --bg, --panel, …
+name: Light
+colors:
+  bg: "#f4f6f9"          # page background
+  panel: "#ffffff"       # app card, table
+  surface: "#f8fafc"     # control areas
+  line: "#e2e8f0"        # borders, row dividers
+  ink: "#1e293b"         # main text
+  muted: "#64748b"       # bottom lines, labels
+  accent: "#2563eb"      # primary button, links
+  accentInk: "#ffffff"   # text on accent
+  inputBg: "#ffffff"
+  outputBg: "#fcfdfe"
+  hover: "#eef2ff"       # row / button hover
+radius: 8px
+shadow: "0 4px 15px rgba(0,0,0,0.06)"

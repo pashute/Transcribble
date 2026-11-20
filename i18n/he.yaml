@@ -1,0 +1,91 @@
+# Transcribble — Hebrew interface strings
+# Keys must match i18n/en.yaml. A missing key falls back to English.
+meta:
+  name: עברית
+  dir: rtl
+  font: '"Frank Ruhl Libre", "David Libre", serif'
+
+header:
+  tagline: תעתוק פשוט
+  avatar: התחברות (לא זמין כרגע)
+  uiLanguage: שפת ממשק
+  theme: ערכת עיצוב
+  settings: הגדרות
+
+themes:
+  light: בהיר
+  dark: כהה
+  metal: מתכת
+  pastel: פסטל
+
+controls:
+  inputLanguage: שפת המקור
+  method: שיטה
+  translator: מתרגם
+  to: אל
+
+methods:
+  etymological: אטימולוגי (משמר עיצורים היסטוריים)
+  phonetic: פונטי (הגייה אמהרית מודרנית)
+
+languages:
+  auto: זיהוי אוטומטי
+  geez: געז
+  amharic: אמהרית
+  tigrinya: תיגרינית
+  aramaic: ארמית
+  arabic: ערבית
+  hebrew: עברית
+  akkadian: אכדית
+  english: אנגלית
+
+translators:
+  google: Google Translate (זיהוי אוטומטי)
+  dillmann: דילמן (Beta maṣāḥǝft)
+  leslau: לסלאו, מילון השוואתי לגעז
+  wiktionary: ויקימילון (אנגלית)
+  amharicpro: AmharicPro
+  cal: CAL (מילון ארמי מקיף)
+  akkadian: מילון אכדי (assyrianlanguages.org)
+
+input:
+  placeholder: הדביקו וערכו כאן טקסט
+  loadSample: טען דוגמה
+
+output:
+  copy: העתק
+  translate: תרגם
+  copied: התוצאה הועתקה.
+  copyFailed: ההעתקה נכשלה. אפשר לסמן ולהעתיק ידנית.
+
+table:
+  transcript: תעתיק
+  translit: תעתוק
+  translate: תרגום
+  etymology: אטימולוגיה
+  similar: דומים
+  empty: "—"
+
+abbrev:
+  gz: געז
+  am: אמהרית
+  ti: תיגרינית
+  ar: ערבית
+  arc: ארמית
+  syc: סורית
+  akk: אכדית
+  he: עברית
+  bh: עברית מקראית
+  mh: עברית משנאית
+  cf: השווה
+  pl: רבים
+
+settings:
+  arabiziLongVowels: "ערביזי: הכפלת תנועות ארוכות (ā → aa)"
+
+messages:
+  needsInternet: החיפוש דורש חיבור לאינטרנט.
+  searching: "מחפש ב־{source}…"
+  notFound: "לא נמצאה רשומה ב־{source}."
+  lookupFailed: "החיפוש ב־{source} נכשל. בדקו את החיבור ונסו שוב."
+  wordCopied: "המילה {word} הועתקה — הדביקו אותה בחיפוש."

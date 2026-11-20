@@ -1,0 +1,15 @@
+name: Dark
+colors:
+  bg: "#0f172a"
+  panel: "#1e293b"
+  surface: "#172033"
+  line: "#334155"
+  ink: "#e2e8f0"
+  muted: "#94a3b8"
+  accent: "#60a5fa"
+  accentInk: "#0f172a"
+  inputBg: "#111827"
+  outputBg: "#0b1220"
+  hover: "#24324a"
+radius: 8px
+shadow: "0 4px 15px rgba(0,0,0,0.4)"

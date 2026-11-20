@@ -1,0 +1,15 @@
+name: Pastel
+colors:
+  bg: "#fdf6f0"
+  panel: "#fffdfb"
+  surface: "#f3eefb"
+  line: "#e8dcef"
+  ink: "#3d3550"
+  muted: "#8a7f9c"
+  accent: "#b38ad6"
+  accentInk: "#ffffff"
+  inputBg: "#fffaf5"
+  outputBg: "#f6fbf8"
+  hover: "#fbe9f0"
+radius: 14px
+shadow: "0 4px 18px rgba(179,138,214,0.15)"

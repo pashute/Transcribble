@@ -1,0 +1,90 @@
+# Transcribble — English interface strings (source of all keys; fallback for other languages)
+meta:
+  name: English
+  dir: ltr
+  font: 'system-ui, "Segoe UI", Arial, sans-serif'
+
+header:
+  tagline: simple transcription
+  avatar: Log in (not available yet)
+  uiLanguage: Interface language
+  theme: Theme
+  settings: Settings
+
+themes:
+  light: Light
+  dark: Dark
+  metal: Metal
+  pastel: Pastel
+
+controls:
+  inputLanguage: Input language
+  method: Method
+  translator: Translator
+  to: To
+
+methods:
+  etymological: Etymological (keeps historical consonants)
+  phonetic: Phonetic (modern Amharic sound)
+
+languages:
+  auto: Auto-detect
+  geez: Ge'ez
+  amharic: Amharic
+  tigrinya: Tigrinya
+  aramaic: Aramaic
+  arabic: Arabic
+  hebrew: Hebrew
+  akkadian: Akkadian
+  english: English
+
+translators:
+  google: Google Translate (auto-detect)
+  dillmann: Dillmann (Beta maṣāḥǝft)
+  leslau: Leslau, Comparative Dictionary of Ge'ez
+  wiktionary: Wiktionary (English)
+  amharicpro: AmharicPro
+  cal: CAL (Comprehensive Aramaic Lexicon)
+  akkadian: Akkadian Dictionary (assyrianlanguages.org)
+
+input:
+  placeholder: Paste and edit text here
+  loadSample: LOAD SAMPLE
+
+output:
+  copy: COPY
+  translate: TRANSLATE
+  copied: Copied.
+  copyFailed: Copy failed. Select the text and copy it manually.
+
+table:
+  transcript: Transcript
+  translit: Translit
+  translate: Translate
+  etymology: Etymology
+  similar: Similar
+  empty: "—"
+
+abbrev:
+  gz: Ge'ez
+  am: Amharic
+  ti: Tigrinya
+  ar: Arabic
+  arc: Aramaic
+  syc: Syriac
+  akk: Akkadian
+  he: Hebrew
+  bh: Biblical Hebrew
+  mh: Mishnaic Hebrew
+  cf: compare
+  pl: plural
+
+settings:
+  arabiziLongVowels: "Arabizi: double long vowels (ā → aa)"
+
+messages:
+  needsInternet: Lookup needs an internet connection.
+  searching: "Searching {source}…"
+  notFound: "No entry found in {source}."
+  lookupFailed: "Lookup in {source} failed. Check your connection and try again."
+  wordCopied: "{word} copied — paste it into the search box."
