@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transcribble v1.0.4 — interface mockup</title>
+<style>
+  :root { --bg:#f4f6f9; --panel:#fff; --line:#e2e8f0; --ink:#1e293b; --muted:#64748b; --accent:#2563eb; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 system-ui, "Segoe UI", Arial, sans-serif; }
+  .app { max-width:1180px; margin:20px auto; background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  header { display:flex; align-items:center; justify-content:space-between; padding:12px 18px; border-bottom:1px solid var(--line); }
+  header h1 { margin:0; font-size:18px; }
+  header h1 small { color:var(--muted); font-weight:400; }
+  .tools { display:flex; gap:8px; align-items:center; }
+  .avatar { width:28px; height:28px; border-radius:50%; background:#cbd5e1; opacity:.5; }
+  select, button { font:inherit; padding:5px 10px; border:1px solid #cbd5e1; border-radius:6px; background:#fff; }
+  button.primary { background:var(--accent); color:#fff; border:none; font-weight:600; }
+  main { display:grid; grid-template-columns: 5fr 7fr; gap:16px; padding:16px; }
+  .ctrl { display:flex; flex-wrap:wrap; gap:12px; background:#f8fafc; border:1px solid var(--line); border-radius:8px; padding:10px; margin-bottom:12px; }
+  .ctrl label { display:flex; flex-direction:column; font-size:12px; font-weight:600; gap:3px; }
+  textarea { width:100%; height:150px; border:1px solid #cbd5e1; border-radius:8px; padding:10px; font:18px/1.7 "Noto Sans Ethiopic", "Abyssinica SIL", FreeSerif, serif; resize:none; }
+  textarea.out { font-family:"Frank Ruhl Libre", "David Libre", FreeSerif, serif; background:#fcfdfe; }
+  .actions { display:flex; gap:8px; margin:6px 0 14px; }
+  table { width:100%; border-collapse:collapse; }
+  th { font-size:12px; text-align:center; color:var(--muted); border-bottom:2px solid var(--line); padding:6px; }
+  td { border-bottom:1px solid var(--line); padding:6px 8px; text-align:center; vertical-align:middle; }
+  td .t { display:block; font-size:16px; }
+  td .b { display:block; font-size:12px; color:var(--muted); }
+  td a { color:var(--accent); text-decoration:none; }
+  .gz { font-family:"Noto Sans Ethiopic", FreeSerif, serif; }
+  .he { font-family:"Frank Ruhl Libre", FreeSerif, serif; }
+  abbr { font-size:10px; text-decoration:underline dotted; cursor:help; color:var(--muted); }
+  .etym { font-size:13px; }
+  .note { padding:0 16px 14px; color:var(--muted); font-size:12px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Transcribble v1.0.4 <small data-i18n="tagline">— simple transcription</small></h1>
+    <div class="tools">
+      <span class="avatar" title="Login (disabled)"></span>
+      <select id="uiLang" aria-label="Interface language"><option value="en">English</option><option value="he">עברית</option></select>
+      <select aria-label="Theme"><option>Light</option><option>Dark</option><option>Metal</option><option>Pastel</option></select>
+    </div>
+  </header>
+
+  <main>
+    <!-- LEFT COLUMN -->
+    <section>
+      <div class="ctrl">
+        <label><span data-i18n="inLang">Input language</span>
+          <select><option>Auto-detect</option><option selected>Ge'ez</option><option>Amharic</option><option>Tigrinya</option><option>Aramaic</option><option>Arabic</option><option>Hebrew</option><option>Akkadian</option></select></label>
+        <label><span data-i18n="method">Method</span>
+          <select><option data-i18n="etym">Etymological</option><option data-i18n="phon">Phonetic</option></select></label>
+        <label><span data-i18n="engine">Translator</span>
+          <select><option>Google Translate (auto)</option><option>Dillmann</option><option>Leslau</option><option>Wiktionary (EN)</option></select></label>
+      </div>
+      <textarea dir="ltr" lang="gez" aria-label="Input">ዝንቱ ፡ ነገረ ፡ ኩፋሌ ፡ መዋዕለ ፡ ሕግ ፡ ወስምዕ ፡ ለግብረ ፡ ዓመታት ።</textarea>
+      <div class="actions"><button data-i18n="sample">LOAD SAMPLE</button></div>
+      <textarea class="out" dir="rtl" lang="he" readonly aria-label="Output">זנת נגר כפל מועל חג וסמע לגבר עמתת.</textarea>
+      <div class="actions"><button class="primary" data-i18n="copy">COPY</button><button data-i18n="translate">TRANSLATE</button></div>
+    </section>
+
+    <!-- RIGHT COLUMN -->
+    <section>
+      <div class="ctrl">
+        <label><span data-i18n="to">To</span>
+          <select><option data-i18n="hebrew">Hebrew</option><option data-i18n="english">English</option></select></label>
+      </div>
+      <table>
+        <thead><tr>
+          <th data-i18n="c1">Transcript</th><th data-i18n="c2">Translit</th><th data-i18n="c3">Translate</th><th data-i18n="c4">Etymology</th><th data-i18n="c5">Similar</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td><a class="t gz" href="https://translate.google.com/?sl=auto&amp;tl=iw&amp;op=translate&amp;text=%E1%8B%9D%E1%8A%95%E1%89%B1" target="_blank">ዝንቱ</a><span class="b he">זנת</span></td>
+            <td><span class="t he">זֶנְתוּ</span><span class="b" dir="auto">zentu</span></td>
+            <td><span class="t he">זה</span><span class="b he">כינוי רומז, ז׳ יח׳</span></td>
+            <td class="etym" dir="ltr"><abbr title="Ge'ez">gz</abbr> ze+n+tu · <abbr title="Biblical Hebrew">bh</abbr> <span class="he">זה</span></td>
+            <td class="he">זה</td>
+          </tr>
+          <tr>
+            <td><a class="t gz" href="https://translate.google.com/?sl=auto&amp;tl=iw&amp;op=translate&amp;text=%E1%8A%90%E1%8C%88%E1%88%A8" target="_blank">ነገረ</a><span class="b he">נגר</span></td>
+            <td><span class="t he">נַגַרַ</span><span class="b" dir="auto">nagara</span></td>
+            <td><span class="t he">סיפור (של)</span><span class="b he">ש״ע, נסמך</span></td>
+            <td class="etym" dir="ltr"><abbr title="Ge'ez">gz</abbr> ngr "speak" · <abbr title="Biblical Hebrew">bh</abbr> <span class="he">הגיד</span></td>
+            <td class="he">נגד · הגיד</td>
+          </tr>
+          <tr>
+            <td><a class="t gz" href="https://translate.google.com/?sl=auto&amp;tl=iw&amp;op=translate&amp;text=%E1%8A%A9%E1%8D%8B%E1%88%8C" target="_blank">ኩፋሌ</a><span class="b he">כפל</span></td>
+            <td><span class="t he">כֻּפָאלֵה</span><span class="b" dir="auto">kufale</span></td>
+            <td><span class="t he">חלוקה</span><span class="b he">ש״ע</span></td>
+            <td class="etym" dir="ltr"><abbr title="Ge'ez">gz</abbr> kfl "divide" · <abbr title="Arabic">ar</abbr> <span>كفل</span></td>
+            <td class="he">כפל · חלק</td>
+          </tr>
+          <tr>
+            <td><a class="t gz" href="https://translate.google.com/?sl=auto&amp;tl=iw&amp;op=translate&amp;text=%E1%88%98%E1%8B%8B%E1%8B%95%E1%88%88" target="_blank">መዋዕለ</a><span class="b he">מועל</span></td>
+            <td><span class="t he">מַוָאעֶלַ</span><span class="b" dir="auto">mawa3ela</span></td>
+            <td><span class="t he">ימי</span><span class="b he">ש״ע רבים, נסמך</span></td>
+            <td class="etym" dir="ltr"><abbr title="Ge'ez">gz</abbr> pl. of ዕለት "day"</td>
+            <td class="he">מועד · ימי</td>
+          </tr>
+          <tr>
+            <td><a class="t gz" href="https://translate.google.com/?sl=auto&amp;tl=iw&amp;op=translate&amp;text=%E1%88%95%E1%8C%8D" target="_blank">ሕግ</a><span class="b he">חג</span></td>
+            <td><span class="t he">חֶגְּ</span><span class="b" dir="auto">7egg</span></td>
+            <td><span class="t he">חוק</span><span class="b he">ש״ע</span></td>
+            <td class="etym" dir="ltr"><abbr title="Ge'ez">gz</abbr> ḥgg · <abbr title="Biblical Hebrew">bh</abbr> <span class="he">חק</span></td>
+            <td class="he">חוק</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+  <p class="note" data-i18n="note">Mockup only — sample values are illustrative. Hover the small abbreviations; switch the interface language at the top.</p>
+</div>
+<script>
+  const strings = {
+    he: { tagline:"— תעתוק פשוט", inLang:"שפת המקור", method:"שיטה", engine:"מתרגם", etym:"אטימולוגי", phon:"פונטי",
+          sample:"טען דוגמה", copy:"העתק", translate:"תרגם", to:"אל", hebrew:"עברית", english:"אנגלית",
+          c1:"תעתיק", c2:"תעתוק", c3:"תרגום", c4:"אטימולוגיה", c5:"דומים",
+          note:"הדמיה בלבד — הערכים לדוגמה. רחפו מעל הקיצורים; החליפו את שפת הממשק למעלה." }
+  };
+  const en = {};
+  document.querySelectorAll("[data-i18n]").forEach(el => en[el.dataset.i18n] = el.textContent);
+  strings.en = en;
+  document.getElementById("uiLang").addEventListener("change", e => {
+    const lang = e.target.value;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === "he" ? "rtl" : "ltr";
+    document.querySelectorAll("[data-i18n]").forEach(el => el.textContent = strings[lang][el.dataset.i18n]);
+  });
+</script>
+</body>
+</html>
